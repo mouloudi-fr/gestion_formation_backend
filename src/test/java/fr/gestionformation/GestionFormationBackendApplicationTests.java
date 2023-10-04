@@ -7,7 +7,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest(classes=GestionFormationBackendApplicationTests.class)
 @ActiveProfiles("test")
-@ContextConfiguration
 class GestionFormationBackendApplicationTests {
 
 	@Test

@@ -37,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @WebMvcTest(SessionRestController.class)
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Slf4j
 class SessionRestControllerTest {
