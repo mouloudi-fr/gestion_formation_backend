@@ -9,21 +9,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -54,6 +54,7 @@ class SessionRestControllerTest {
 	
 	
 	Session session1 = Session.builder()
+			.id(1L)
 			.name("Développeur web")
 			.track("Java")
 			.dateSession(LocalDateTime.of(2023, 10, 20, 11,30))
@@ -64,6 +65,7 @@ class SessionRestControllerTest {
 			.build();
 	
 	Session session2 = Session.builder()
+			.id(2L)
 			.name("Développeur mobile")
 			.track("Flutter")
 			.dateSession(LocalDateTime.of(2024, 01, 20, 14,30))
@@ -120,6 +122,44 @@ class SessionRestControllerTest {
 		
 	}
 	
+	@Test
+	void ShouldReturnSingleSessionById() throws Exception {
+		log.info(sessions.get(0).toString());
+		
+		
+		//Given
+		when(this.sessionService.getOneSession(1L)).thenReturn(Optional.of(sessions.get(0)));
+		
+		//When 
+		RequestBuilder request =get("/v1/sessions/1").contentType(MediaType.APPLICATION_JSON);
+		MvcResult mvcResult =mockMvc.perform(request).andDo(print())
+				.andExpect(status().is(200))
+				.andReturn();
+		//Then
+		String sessionAsString =mvcResult.getResponse().getContentAsString();
+		Session session =objectMapper.readValue(sessionAsString, new TypeReference<Session>() {
+		});
+		
+		assertEquals(session.getId(), sessions.get(0).getId());
+		assertEquals(session.getTrack(), sessions.get(0).getTrack());
+	}
+	
+	@Test
+	void ShouldReturnBadRequestWhenIdNotExist() throws Exception {
+		
+		//Given
+		Long id=99L;
+		when(this.sessionService.getOneSession(1L)).thenReturn(Optional.of(sessions.get(0)));
+		
+		//When 
+		RequestBuilder request =get("/v1/sessions/"+id).contentType(MediaType.APPLICATION_JSON);
+		ResultActions resultActions =mockMvc.perform(request).andDo(print());
+			
+				
+		//Then
+		resultActions.andExpect(status().isInternalServerError());
+		
+	}
 	@Data
 	public static class PageImplDeserializer<T> {
 	    

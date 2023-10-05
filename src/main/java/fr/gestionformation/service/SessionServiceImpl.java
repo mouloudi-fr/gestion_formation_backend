@@ -1,6 +1,8 @@
 package fr.gestionformation.service;
 
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,14 @@ public class SessionServiceImpl implements SessionService {
 	public Page<Session> getAllSessions(Pageable page) {
 		// TODO Auto-generated method stub
 		return sessionRepository.findAll(page);
+	}
+
+
+	@Override
+	public Optional<Session> getOneSession(Long id) {
+		// TODO Auto-generated method stub
+		
+		return sessionRepository.findById(id);
 	}
 
 }
