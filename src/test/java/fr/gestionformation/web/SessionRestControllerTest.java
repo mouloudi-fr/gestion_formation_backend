@@ -1,5 +1,6 @@
 package fr.gestionformation.web;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,13 +19,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
-
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -160,6 +163,49 @@ class SessionRestControllerTest {
 		resultActions.andExpect(status().isInternalServerError());
 		
 	}
+	
+	@Test
+	void shouldSuccessCreateSession() throws  Exception {
+		
+		//Given
+		
+		when(this.sessionService.saveSession(session1)).thenAnswer(i-> i.getArguments()[0]);
+		
+		//When
+		 MvcResult result = mockMvc.perform( MockMvcRequestBuilders
+	                .post("/v1/sessions/addSession")
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .content(objectMapper.writeValueAsString(sessions.get(0))))
+	                .andDo(print())
+	                .andReturn();
+		 
+		// Then
+	        MockHttpServletResponse response = result.getResponse();
+	        Session session = objectMapper.readValue(response.getContentAsString(), Session.class);
+	        assertEquals(response.getStatus(), HttpStatus.CREATED.value());
+	        assertNotNull(response);
+	        assertEquals(session.getId(),sessions.get(0).getId());
+	}
+	
+	@Test
+    public void shouldReturn400WhenSessionJsonIsNotValid() throws Exception {
+        // Given
+        Session sessionWithoutName = Session.builder()
+        		.id(1L)
+        		.address("325 bd arfaoui Casablanca")
+        		.dateSession(LocalDateTime.of(2024, 02, 24, 23, 59)).build();
+        // When
+        MvcResult result = mockMvc.perform( MockMvcRequestBuilders
+                .post("/v1/sessions/addSession")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sessionWithoutName)))
+                .andDo(print())
+                .andReturn();
+        // Then
+        assertEquals(result.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+
+    }
+	
 	@Data
 	public static class PageImplDeserializer<T> {
 	    

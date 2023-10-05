@@ -35,4 +35,11 @@ public class SessionServiceImpl implements SessionService {
 		return sessionRepository.findById(id);
 	}
 
+
+	@Override
+	public Session saveSession(Session session) {
+		// TODO Auto-generated method stub
+		return sessionRepository.save(session);
+	}
+
 }

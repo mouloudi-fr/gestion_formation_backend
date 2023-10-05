@@ -14,5 +14,6 @@ public interface SessionService {
 	
 	public Page<Session> getAllSessions(Pageable page);
 	public Optional<Session> getOneSession(Long id);
+	public Session saveSession(Session session);
 
 }
