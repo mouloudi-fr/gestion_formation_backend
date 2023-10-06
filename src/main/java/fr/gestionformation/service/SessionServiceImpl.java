@@ -42,4 +42,11 @@ public class SessionServiceImpl implements SessionService {
 		return sessionRepository.save(session);
 	}
 
+
+	@Override
+	public void deleteSession(Long id) {
+		// TODO Auto-generated method stub
+		 sessionRepository.deleteById(id);
+	}
+
 }
