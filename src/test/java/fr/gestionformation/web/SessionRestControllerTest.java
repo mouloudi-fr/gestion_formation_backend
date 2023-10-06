@@ -2,6 +2,7 @@ package fr.gestionformation.web;
 
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -204,6 +205,22 @@ class SessionRestControllerTest {
         // Then
         assertEquals(result.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
 
+    }
+	
+	
+	@Test
+    public void shouldSuccessDeleteSession() throws Exception {
+        // Given
+        doNothing().when(sessionService).deleteSession(1L);;
+		
+        // When
+        MvcResult mvcResult = mockMvc.perform( MockMvcRequestBuilders
+                .delete("/v1/sessions/deleteSession/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andReturn();
+        // Then
+        assertEquals(mvcResult.getResponse().getStatus(), HttpStatus.NO_CONTENT.value());
     }
 	
 	@Data
